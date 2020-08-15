@@ -414,11 +414,12 @@ Module.register('MMM-BackgroundSlideshow', {
             try {
               dateTime = moment(dateTime, 'YYYY:MM:DD HH:mm:ss');
               dateTime = dateTime.format('dddd MMMM D, YYYY HH:mm');
-              shortDateTime = moment(dateTime, 'YYYY:MM:DD HH:mm:ss');
-              shortDateTime = dateTime.format('MMMM D, YYYY');
+              shortDateTime = moment(shortDateTime, 'YYYY:MM:DD HH:mm:ss');
+              shortDateTime = shortDateTime.format('MMM D, YYYY');
             } catch (e) {
               console.log('Failed to parse dateTime: ' + dateTime + ' to format YYYY:MM:DD HH:mm:ss');
               dateTime = '';
+              shortDateTime = '';
             }
           }
           // TODO: allow for location lookup via openMaps
