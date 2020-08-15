@@ -34,7 +34,7 @@ Module.register('MMM-BackgroundSlideshow', {
     // show a panel containing information about the image currently displayed.
     showImageInfo: false,
     // a comma separated list of values to display: name, date, geo (TODO)
-    imageInfo: 'name, date, imagecount',
+    imageInfo: 'name, date, short-date, imagecount, tags',
     // location of the info div
     imageInfoLocation: 'bottomRight', // Other possibilities are: bottomLeft, topLeft, topRight
     // transition speed from one image to the other, transitionImages must be true
@@ -95,7 +95,7 @@ Module.register('MMM-BackgroundSlideshow', {
     // this.errorMessage = null;
 
     //validate imageinfo property.  This will make sure we have at least 1 valid value
-    const imageInfoRegex = /\bname\b|\bdate\b/gi;
+    const imageInfoRegex = /\bname\b|\bdate\b|\bshort-date\b|\btags\b/gi;
     if (this.config.showImageInfo && !imageInfoRegex.test(this.config.imageInfo)) {
       Log.warn('MMM-BackgroundSlideshow: showImageInfo is set, but imageInfo does not have a valid value.');
       // Use name as the default
@@ -407,11 +407,14 @@ Module.register('MMM-BackgroundSlideshow', {
       EXIF.getData(image, () => {
         if (this.config.showImageInfo) {
           let dateTime = EXIF.getTag(image, 'DateTimeOriginal');
+          let shortDateTime = null;
+          let iptcTags = EXIF.getIptcTag(image, 'keywords');
           // attempt to parse the date if possible
           if (dateTime !== null) {
             try {
               dateTime = moment(dateTime, 'YYYY:MM:DD HH:mm:ss');
               dateTime = dateTime.format('dddd MMMM D, YYYY HH:mm');
+              shortDateTime = dateTime.format('MMMM D, YYYY');
             } catch (e) {
               console.log('Failed to parse dateTime: ' + dateTime + ' to format YYYY:MM:DD HH:mm:ss');
               dateTime = '';
@@ -424,7 +427,7 @@ Module.register('MMM-BackgroundSlideshow', {
           // if (lat && lon) {
           //   // Get small map of location
           // }
-          this.updateImageInfo(decodeURI(image.src), dateTime);
+          this.updateImageInfo(decodeURI(image.src), dateTime, shortDateTime, iptcTags);
         }
 
         if (!this.browserSupportsExifOrientationNatively) {
@@ -468,7 +471,7 @@ Module.register('MMM-BackgroundSlideshow', {
     }
   },
 
-  updateImageInfo: function (imageSrc, imageDate) {
+  updateImageInfo: function (imageSrc, imageDate, imageShortDate, imageTags) {
     let imageProps = [];
     this.config.imageInfo.forEach((prop, idx) => {
       switch (prop) {
@@ -477,7 +480,16 @@ Module.register('MMM-BackgroundSlideshow', {
             imageProps.push(imageDate);
           }
           break;
-
+        case 'short-date':
+          if (imageShortDate && imageShortDate != 'Invalid date') {
+            imageProps.push(imageShortDate);
+          }
+          break;
+        case 'tags':
+          if (imageTags) {
+            imageProps.push(imageTags);
+          }
+          break;
         case 'name': // default is name
           // Only display last path component as image name if recurseSubDirectories is not set.
           let imageName = imageSrc.split('/').pop();
@@ -506,7 +518,7 @@ Module.register('MMM-BackgroundSlideshow', {
       }
     });
 
-    let innerHTML = '<header class="infoDivHeader">Picture Info</header>';
+    let innerHTML = '<header class="infoDivHeader">Image</header>';
     imageProps.forEach((val, idx) => {
       innerHTML += val + '<br/>';
     });
