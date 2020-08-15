@@ -407,13 +407,14 @@ Module.register('MMM-BackgroundSlideshow', {
       EXIF.getData(image, () => {
         if (this.config.showImageInfo) {
           let dateTime = EXIF.getTag(image, 'DateTimeOriginal');
-          let shortDateTime = null;
+          let shortDateTime = EXIF.getTag(image, 'DateTimeOriginal');
           let iptcTags = EXIF.getIptcTag(image, 'keywords');
           // attempt to parse the date if possible
           if (dateTime !== null) {
             try {
               dateTime = moment(dateTime, 'YYYY:MM:DD HH:mm:ss');
               dateTime = dateTime.format('dddd MMMM D, YYYY HH:mm');
+              shortDateTime = moment(dateTime, 'YYYY:MM:DD HH:mm:ss');
               shortDateTime = dateTime.format('MMMM D, YYYY');
             } catch (e) {
               console.log('Failed to parse dateTime: ' + dateTime + ' to format YYYY:MM:DD HH:mm:ss');
