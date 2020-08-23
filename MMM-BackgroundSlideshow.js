@@ -520,7 +520,7 @@ Module.register('MMM-BackgroundSlideshow', {
       }
     });
 
-    let innerHTML = '<header class="infoDivHeader">Image</header>';
+    let innerHTML = '<header class="infoDivHeader"></header>';
     imageProps.forEach((val, idx) => {
       innerHTML += val + '<br/>';
     });
