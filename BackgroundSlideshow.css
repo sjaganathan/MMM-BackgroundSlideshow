@@ -178,6 +178,7 @@
 .MMM-BackgroundSlideshow .bottomRight {
   bottom: 0pt;
   right: 0pt;
+  text-align: right;
   border-width: 1pt 0 0 1pt;
   border-top-left-radius: 20pt;
 }
